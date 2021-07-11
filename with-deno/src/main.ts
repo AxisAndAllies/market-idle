@@ -1,6 +1,6 @@
-import { initDatabases, itemsDb, usersDb, Item, User } from "./db.ts";
-import { Application, Router } from "./deps.ts";
-import { addUser } from "./auth.ts";
+import { initDatabases, itemsDb, Item } from "./db.ts";
+import { Application, Router, RouterContext } from "./deps.ts";
+import { addUser, getNameFromUUID } from "./auth.ts";
 // import { log } from "./deps.ts";
 
 // custom configuration with 2 loggers (the default and `tasks` loggers)
@@ -31,6 +31,16 @@ import { addUser } from "./auth.ts";
 
 await initDatabases();
 
+const getNameFromHeader = async (ctx: RouterContext) => {
+  let token = ctx.response.headers.get("Authorization")?.split(" ")[1];
+  const name = await getNameFromUUID(token);
+  if (!name) {
+    ctx.response.body = { error: "No user found." };
+    return;
+  }
+  return name;
+};
+
 const router = new Router();
 router
   .get("/", (ctx) => {
@@ -42,12 +52,17 @@ router
     ctx.response.body = items;
   })
   .post("/items", async (ctx) => {
-    //@ts-ignore casting
-    const newItem = ctx.request.body().value as Item;
+    // create new item
+    const name = await getNameFromHeader(ctx);
+    if (!name) {
+      return;
+    }
+    const newItem = (await ctx.request.body().value) as Item;
+
     const uuid = crypto.randomUUID();
     await itemsDb.insertOne({
       id: uuid,
-      ownerName: "asdf",
+      ownerName: name,
       price: newItem.price,
       name: newItem.name,
       amount: newItem.amount,
@@ -58,6 +73,20 @@ router
     let id = ctx.params?.id;
     if (!id) return;
     const item = await itemsDb.findOne({ id });
+    ctx.response.body = item;
+  })
+  .patch("/items/:id", async (ctx) => {
+    let id = ctx.params?.id;
+    if (!id) return;
+    const name = await getNameFromHeader(ctx);
+    if (!name) {
+      return;
+    }
+    const item = await itemsDb.findOne({ id, ownerName: name });
+    if (!item) {
+      ctx.response.body;
+    }
+    await itemsDb.updateOne({ id }, {});
     ctx.response.body = item;
   });
 
