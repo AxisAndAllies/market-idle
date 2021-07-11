@@ -2,7 +2,8 @@ import express from "express";
 import * as uuid from "uuid";
 import db, { getUserID } from "./db.mjs";
 import { getUserName } from "./db.mjs";
-import { body, validationResult } from "express-validator";
+import { body, param, validationResult } from "express-validator";
+import { getItem } from "./db.mjs";
 
 const auth = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -24,6 +25,7 @@ const port = 8000;
 
 app.use(express.json());
 
+/** Public endpoints */
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
@@ -39,10 +41,12 @@ app.post("/auth", body("name").isAlphanumeric(), (req, res) => {
   db.write();
   return res.json({ id });
 });
+
 app.get("/items", (req, res) => {
   res.json(db.data.items);
 });
 
+/** Endpoints that require authentication */
 app.post(
   "/items",
   auth,
@@ -50,7 +54,6 @@ app.post(
   body("amount").isNumeric(),
   body("name").isAlphanumeric(),
   (req, res) => {
-    // Finds the validation errors in this request and wraps them in an object with handy functions
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -58,7 +61,7 @@ app.post(
 
     let { name, amount, price } = req.body;
     let id = uuid.v4();
-    db.data.items.push({ id, name, amount, price, ownerName: res.username });
+    db.data.items.push({ id, name, amount, price, ownerName: req.username });
     db.write();
     return res.json({ id });
   }
@@ -70,18 +73,65 @@ app.patch(
   body("price").isNumeric().optional(),
   body("amount").isNumeric().optional(),
   body("name").isAlphanumeric().optional(),
+  param("id").isUUID(),
   (req, res) => {
-    res.send("Hello World!");
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    let item = getItem(req.params.id);
+    if (!item) {
+      return res.status(404).json({ errors: "Item not found." });
+    }
+    if (item.ownerName != req.username) {
+      return res.status(400).json({ errors: "Not your item." });
+    }
+
+    // update item
+    let { name, amount, price } = req.body;
+    item = { ...item, price, name, amount };
+    let index = db.data.items.findIndex((e) => e.id == item.id);
+    db.data.items[index] = item;
+    db.write();
+    return res.json({ id });
   }
 );
 
-app.delete("/items/:id", auth, (req, res) => {
-  res.send("Hello World!");
+app.delete("/items/:id", auth, param("id").isUUID(), (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  let item = getItem(req.params.id);
+  if (!item) {
+    return res.status(404).json({ errors: "Item not found." });
+  }
+  if (item.ownerName != req.username) {
+    return res.status(400).json({ errors: "Not your item." });
+  }
+  db.data.items = db.data.items.filter((u) => u.id !== req.params.id);
+  db.write();
+  res.json({ success: "true" });
 });
 
-app.post("/items/:id/buy", auth, body("amount").isNumeric(), (req, res) => {
-  res.send("Hello World!");
-});
+app.post(
+  "/items/:id/buy",
+  auth,
+  param("id").isUUID(),
+  body("amount").isNumeric(),
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    let item = getItem(req.params.id);
+    if (!item) {
+      return res.status(404).json({ errors: "Item not found." });
+    }
+    res.send("Hello World!");
+  }
+);
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);

@@ -20,6 +20,10 @@ export const getUserID = (name) => {
   return db.data.users.find((u) => u.name == name)?.id;
 };
 
+export const getItem = (id) => {
+  return db.data.items.find((u) => u.id == id);
+};
+
 /*
 export type Item = {
   id: string,
