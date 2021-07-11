@@ -19,3 +19,18 @@ export const getUserName = (id) => {
 export const getUserID = (name) => {
   return db.data.users.find((u) => u.name == name)?.id;
 };
+
+/*
+export type Item = {
+  id: string,
+  name: string,
+  amount: number,
+  price: number,
+  ownerName: string,
+};
+
+export type User = {
+  name: string,
+  id: string,
+};
+*/

@@ -3,19 +3,14 @@
     {
       "id": "ef42f33d-2fcd-4dbc-9b6d-36875d05946d",
       "name": "foo"
-    },
-    {
-      "id": "5186b711-9a07-45a2-9723-88a888333f0c",
-      "name": "foo"
-    },
-    {
-      "id": "3d99831e-7ef7-4b65-97eb-4871c96229a3",
-      "name": "foo"
-    },
-    {
-      "id": "13eee91a-d069-4856-b71d-bc5197e291aa",
-      "name": "foo"
     }
   ],
-  "items": []
+  "items": [
+    {
+      "id": "406ad09d-b22e-489d-b91e-aadb0de8e4d8",
+      "name": "hammer",
+      "amount": 20,
+      "price": 1
+    }
+  ]
 }
