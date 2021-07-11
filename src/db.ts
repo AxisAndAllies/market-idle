@@ -12,11 +12,12 @@ export type User = {
   name: string;
   uuid: string;
 };
-// Initialization
-export const init = async () => {
-  const itemsDb = new Database<Item>("./items.json");
-  const usersDb = new Database<User>("./users.json");
 
+export const itemsDb = new Database<Item>("../db/items.json");
+export const usersDb = new Database<User>("../db/users.json");
+
+// Initialization
+export const initDatabases = async () => {
   await itemsDb.insertOne({
     id: crypto.randomUUID(),
     ownerName: "bob",
@@ -29,5 +30,4 @@ export const init = async () => {
     name: "bob",
     uuid: crypto.randomUUID(),
   });
-  return { itemsDb: itemsDb, usersDb: usersDb };
 };
