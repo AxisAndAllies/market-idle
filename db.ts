@@ -1,10 +1,11 @@
-import { Database } from "https://deno.land/x/aloedb@0.9.0/mod.ts";
+import { Database } from "./deps.ts";
 
 export type Item = {
-  ownerName: string;
+  id: string;
   name: string;
   amount: number;
   price: number;
+  ownerName: string;
 };
 
 export type User = {
@@ -17,6 +18,7 @@ export const init = async () => {
   const usersDb = new Database<User>("./users.json");
 
   await itemsDb.insertOne({
+    id: crypto.randomUUID(),
     ownerName: "bob",
     name: "hammer",
     amount: 3,
