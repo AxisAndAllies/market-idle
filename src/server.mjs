@@ -1,6 +1,25 @@
 import express from "express";
 import { v4 } from "uuid";
 import db, { getUserID } from "./db.mjs";
+import { getUserName } from "./db.mjs";
+
+const auth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+
+    let name = getUserName(token);
+
+    if (!name) {
+      return res.sendStatus(403);
+    }
+
+    req.username = name;
+    next();
+  } else {
+    res.sendStatus(401);
+  }
+};
 
 const app = express();
 const port = 8000;
@@ -13,7 +32,7 @@ app.get("/", (req, res) => {
 app.post("/auth", (req, res) => {
   let { name } = req.body;
   let existing = getUserID(name);
-  if (existing) res.json({ error: "User exists" });
+  if (existing) res.status(400).json({ error: "User exists" });
   let id = v4();
 
   db.data.users.push({ id, name });
@@ -24,8 +43,8 @@ app.get("/items", (req, res) => {
   res.send(db.data.items);
 });
 
-app.post("/items", (req, res) => {
-  res.send("Hello World!");
+app.post("/items", auth, (req, res) => {
+  res.send(`Hello, ${req.username}`);
 });
 
 app.patch("/items/:id", (req, res) => {
