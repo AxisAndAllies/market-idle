@@ -27,7 +27,7 @@ app.use(express.json());
 
 /** Public endpoints */
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Hello World2");
 });
 app.post("/auth", body("name").isAlphanumeric(), (req, res) => {
   let { name } = req.body;
