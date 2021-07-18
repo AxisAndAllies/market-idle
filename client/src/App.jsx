@@ -1,13 +1,19 @@
 //@ts-check
 import React, { useState, useEffect } from 'react';
-import useFetch from 'use-http';
+import { useApi } from './api';
 import './App.css';
 
 function App() {
   // Create the count state.
   const [count, setCount] = useState(0);
-  const [token, setToken] = useState('');
-  const { loading, error, data: items = [] } = useFetch('/items', {}, []);
+  const [token, setToken] = useState('Hi');
+  // useEffect(() => {
+  //   (async () => {
+  //     let items = await fetch('/api/items');
+  //     console.log(items);
+  //   })();
+  // }, []);
+  const { loading, error, data: items = [] } = useApi('/items', {}, []);
 
   // Create the counter (+1 every second).
   useEffect(() => {
@@ -19,7 +25,7 @@ function App() {
     <>
       <button
         onClick={(e) => {
-          const { loading, error, data } = useFetch('/api/auth', {}, []);
+          const { loading, error, data } = useApi('/auth', {}, []);
           setToken(data);
         }}
       >

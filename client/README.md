@@ -2,6 +2,9 @@
 
 > ✨ Bootstrapped with Create Snowpack App (CSA).
 
+NOTE:
+- couldn't get snowpack [proxying](https://www.snowpack.dev/guides/routing#scenario-2-proxy-api-paths) to work w/ `http2-proxy`, so just [made custom hook](./src/api.js).
+
 ## Available Scripts
 
 ### npm start
