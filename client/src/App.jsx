@@ -6,13 +6,7 @@ import './App.css';
 function App() {
   // Create the count state.
   const [count, setCount] = useState(0);
-  const [token, setToken] = useState('Hi');
-  // useEffect(() => {
-  //   (async () => {
-  //     let items = await fetch('/api/items');
-  //     console.log(items);
-  //   })();
-  // }, []);
+  const [token, setToken] = useState();
   const { loading, error, data: items = [] } = useApi('/items', {}, []);
 
   // Create the counter (+1 every second).
@@ -22,7 +16,7 @@ function App() {
   }, [count, setCount]);
 
   return (
-    <>
+    <div style={{ margin: 20, padding: 20 }}>
       <button
         onClick={(e) => {
           const { loading, error, data } = useApi('/auth', {}, []);
@@ -36,7 +30,7 @@ function App() {
       {/* {items?.map((todo) => (
         <div key={todo.id}>{todo.title}</div>
       ))} */}
-    </>
+    </div>
   );
 }
 

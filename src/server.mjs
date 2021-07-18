@@ -1,9 +1,8 @@
+import cors from "cors";
 import express from "express";
-import * as uuid from "uuid";
-import db, { getUserID } from "./db.mjs";
-import { getUserName } from "./db.mjs";
 import { body, param, validationResult } from "express-validator";
-import { getItem } from "./db.mjs";
+import * as uuid from "uuid";
+import db, { getItem, getUserID, getUserName } from "./db.mjs";
 
 const auth = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -23,6 +22,8 @@ const auth = (req, res, next) => {
 const app = express();
 const port = 8000;
 
+// allow all, fix later
+app.use(cors());
 app.use(express.json());
 
 /** Public endpoints */

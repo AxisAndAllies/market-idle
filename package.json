@@ -19,6 +19,7 @@
   "homepage": "https://github.com/AxisAndAllies/market-idle#readme",
   "type": "module",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-validator": "^6.12.0",
     "lowdb": "^2.1.0",
